@@ -1,0 +1,60 @@
+# ManhwaNest robots.txt
+# Updated: March 22, 2025
+
+# Global rules for all bots
+User-agent: *
+Allow: /
+Allow: /manga/
+Allow: /search
+Allow: /genre/
+Allow: /latest
+Allow: /popular
+
+# Disallow specific areas
+Disallow: /api/
+Disallow: /_next/
+Disallow: /images/raw/
+Disallow: /.*\?.+$
+Disallow: /manga/*/chapter/*/raw
+Disallow: /bookmarks
+Disallow: /404
+Disallow: /500
+
+# Disallow unnecessary file types
+Disallow: /*.json$
+Disallow: /*.js$
+Disallow: /*.css$
+Disallow: /*.map$
+Disallow: /*.woff$
+Disallow: /*.ttf$
+
+# Rate limiting for large crawlers
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+User-agent: PetalBot
+Crawl-delay: 15
+Disallow: /
+
+User-agent: Baiduspider
+Crawl-delay: 15
+
+User-agent: Bingbot
+Crawl-delay: 5
+
+# Google-specific rules
+User-agent: Googlebot
+Allow: /*
+Disallow: /*?filter=
+Disallow: /api/
+Disallow: /_next/
+
+User-agent: Googlebot-Image
+Allow: /images/
+Disallow: /images/raw/
+
+# Sitemap location
+Sitemap: https://manhwanest.fun/sitemap.xml 
