@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import NextTopLoader from 'nextjs-toploader';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +32,7 @@ export default function Header() {
   // Check if a link is active
   const isLinkActive = (path: string) => {
     if (path === '/' && pathname === '/') return true;
-    if (path !== '/' && pathname.startsWith(path)) return true;
+    if (path !== '/' && pathname?.startsWith(path)) return true;
     return false;
   };
 
@@ -39,6 +40,61 @@ export default function Header() {
   const toggleMobileSearch = () => {
     setShowMobileSearch(!showMobileSearch);
     if (isOpen) setIsOpen(false);
+  };
+
+  // Animation variants
+  const mobileMenuVariants = {
+    closed: { 
+      height: 0,
+      opacity: 0,
+      transition: { 
+        duration: 0.3,
+        ease: "easeInOut",
+        when: "afterChildren" 
+      }
+    },
+    open: { 
+      height: "auto",
+      opacity: 1,
+      transition: { 
+        duration: 0.3,
+        ease: "easeInOut",
+        when: "beforeChildren",
+        staggerChildren: 0.05
+      }
+    }
+  };
+
+  const menuItemVariants = {
+    closed: { 
+      opacity: 0,
+      y: -10,
+      transition: { duration: 0.2 }
+    },
+    open: { 
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.2 }
+    }
+  };
+
+  const searchBarVariants = {
+    closed: { 
+      height: 0,
+      opacity: 0,
+      transition: { 
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    open: { 
+      height: "auto",
+      opacity: 1,
+      transition: { 
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    }
   };
 
   return (
@@ -152,24 +208,26 @@ export default function Header() {
               {/* Mobile buttons */}
               <div className="flex items-center space-x-3 md:hidden">
                 {/* Mobile search toggle button */}
-                <button
+                <motion.button
                   onClick={toggleMobileSearch}
                   className="text-gray-300 hover:text-white transition-colors duration-300 transform hover:scale-110"
                   aria-label="Toggle search"
+                  whileTap={{ scale: 0.9 }}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
-                </button>
+                </motion.button>
 
                 {/* Mobile menu button - With animation */}
-                <button
+                <motion.button
                   onClick={() => {
                     setIsOpen(!isOpen);
                     if (showMobileSearch) setShowMobileSearch(false);
                   }}
                   className="text-gray-300 hover:text-white transition-all duration-300 transform hover:scale-110"
                   aria-label="Main menu"
+                  whileTap={{ scale: 0.9 }}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path 
@@ -179,97 +237,125 @@ export default function Header() {
                       d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} 
                     />
                   </svg>
-                </button>
+                </motion.button>
               </div>
             </div>
           </div>
 
           {/* Mobile search bar - Separate from menu */}
-          <div 
-            className={`transform transition-all duration-300 ease-in-out ${showMobileSearch ? 'max-h-16 opacity-100 py-2' : 'max-h-0 opacity-0 py-0 overflow-hidden'} md:hidden bg-[#0A1525]`}
-          >
-            <div className="container mx-auto px-4">
-              <form action="/search" method="get" className="relative flex items-center">
-                <input
-                  type="text"
-                  name="query"
-                  placeholder="Search manga..."
-                  className="w-full bg-[#111A2E] text-white placeholder-gray-400 border border-gray-800/40 rounded-l-full pl-10 pr-4 py-2 focus:outline-none focus:ring-1 focus:ring-red-500/30"
-                  autoFocus={showMobileSearch}
-                />
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
+          <AnimatePresence>
+            {showMobileSearch && (
+              <motion.div 
+                className="md:hidden bg-[#0A1525] overflow-hidden"
+                initial="closed"
+                animate="open"
+                exit="closed"
+                variants={searchBarVariants}
+              >
+                <div className="container mx-auto px-4 py-2">
+                  <form action="/search" method="get" className="relative flex items-center">
+                    <input
+                      type="text"
+                      name="query"
+                      placeholder="Search manga..."
+                      className="w-full bg-[#111A2E] text-white placeholder-gray-400 border border-gray-800/40 rounded-l-full pl-10 pr-4 py-2 focus:outline-none focus:ring-1 focus:ring-red-500/30"
+                      autoFocus={showMobileSearch}
+                    />
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                    <motion.button 
+                      type="submit" 
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-r-full transition-colors duration-300"
+                      aria-label="Search"
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </motion.button>
+                  </form>
                 </div>
-                <button 
-                  type="submit" 
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-r-full transition-colors duration-300"
-                  aria-label="Search"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </form>
-            </div>
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {/* Mobile menu, animated slide down - Improved design */}
-          <div 
-            id="mobile-menu"
-            className={`transform transition-all duration-300 ease-in-out ${isOpen ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 overflow-hidden'} md:hidden`}
-          >
-            <div className="px-4 pt-2 pb-3 space-y-2 bg-[#0A1525]/90 backdrop-blur-sm">
-              <Link 
-                href="/" 
-                className={`flex justify-center items-center py-2 rounded-full text-base font-medium transition-all duration-300 ${
-                  isLinkActive('/') 
-                    ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] border border-red-500/50' 
-                    : 'text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800'
-                }`}
-                onClick={() => setIsOpen(false)}
+          {/* Mobile menu with Framer Motion */}
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div 
+                id="mobile-menu"
+                className="md:hidden overflow-hidden bg-[#0A1525]/90 backdrop-blur-sm"
+                initial="closed"
+                animate="open"
+                exit="closed"
+                variants={mobileMenuVariants}
               >
-                Home
-              </Link>
-              <Link 
-                href="/latest" 
-                className={`flex justify-center items-center py-2 rounded-full text-base font-medium transition-all duration-300 ${
-                  isLinkActive('/latest') 
-                    ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] border border-red-500/50' 
-                    : 'text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800'
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                Latest
-              </Link>
-              <Link 
-                href="/popular" 
-                className={`flex justify-center items-center py-2 rounded-full text-base font-medium transition-all duration-300 ${
-                  isLinkActive('/popular') 
-                    ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] border border-red-500/50' 
-                    : 'text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800'
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                Popular
-              </Link>
-              <Link 
-                href="/bookmarks" 
-                className={`flex justify-center items-center py-2 rounded-full text-base font-medium transition-all duration-300 ${
-                  isLinkActive('/bookmarks') 
-                    ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] border border-red-500/50' 
-                    : 'text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800'
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                </svg>
-                Bookmarks
-              </Link>
-            </div>
-          </div>
+                <div className="px-4 pt-2 pb-3 space-y-2">
+                  <motion.div variants={menuItemVariants}>
+                    <Link 
+                      href="/" 
+                      className={`flex justify-center items-center py-2 rounded-full text-base font-medium transition-all duration-300 ${
+                        isLinkActive('/') 
+                          ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] border border-red-500/50' 
+                          : 'text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800'
+                      }`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Home
+                    </Link>
+                  </motion.div>
+                  
+                  <motion.div variants={menuItemVariants}>
+                    <Link 
+                      href="/latest" 
+                      className={`flex justify-center items-center py-2 rounded-full text-base font-medium transition-all duration-300 ${
+                        isLinkActive('/latest') 
+                          ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] border border-red-500/50' 
+                          : 'text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800'
+                      }`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Latest
+                    </Link>
+                  </motion.div>
+                  
+                  <motion.div variants={menuItemVariants}>
+                    <Link 
+                      href="/popular" 
+                      className={`flex justify-center items-center py-2 rounded-full text-base font-medium transition-all duration-300 ${
+                        isLinkActive('/popular') 
+                          ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] border border-red-500/50' 
+                          : 'text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800'
+                      }`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Popular
+                    </Link>
+                  </motion.div>
+                  
+                  <motion.div variants={menuItemVariants}>
+                    <Link 
+                      href="/bookmarks" 
+                      className={`flex justify-center items-center py-2 rounded-full text-base font-medium transition-all duration-300 ${
+                        isLinkActive('/bookmarks') 
+                          ? 'bg-gradient-to-r from-red-600 to-red-700 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] border border-red-500/50' 
+                          : 'text-gray-300 hover:text-white hover:bg-gray-800 border border-gray-800'
+                      }`}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                      Bookmarks
+                    </Link>
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </nav>
       </header>
     </>
