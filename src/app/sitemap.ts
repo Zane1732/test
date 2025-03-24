@@ -47,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
   
   const genrePages = genres.map(genre => ({
-    url: `${baseUrl}/genre/${genre}`,
+    url: `${baseUrl}/search?query=${genre}`,
     lastModified: currentDate,
     changeFrequency: 'weekly' as const,
     priority: 0.7,
