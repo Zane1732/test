@@ -186,7 +186,7 @@ export default async function MangaDetail({ params }: MangaDetailProps) {
                             {manga.genres.map((genre, index) => (
                               <Link 
                                 key={index} 
-                                href={`/genre/${genre.toLowerCase()}`}
+                                href={`/search?query=${genre.toLowerCase()}`}
                                 className="bg-gray-800 hover:bg-gray-700 px-2 py-0.5 rounded-full text-xs text-white cursor-pointer transition-colors duration-200 hover:text-red-300 border border-gray-700 hover:border-red-500/30"
                               >
                                 {genre}
