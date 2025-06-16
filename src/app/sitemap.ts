@@ -80,13 +80,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Map manga to sitemap entries
     const mangaPages = uniqueManga.map(manga => ({
       url: `${baseUrl}/manga/${manga.id}`,
-      lastModified: manga.updatedAt || currentDate,
+      lastModified: currentDate,
       changeFrequency: 'weekly' as const,
       priority: 0.8,
-      // Optional: Add image data for Google Image sitemap
-      images: manga.coverImage ? [
-        manga.coverImage
-      ] : undefined,
     }));
     
     // Combine all pages for the sitemap
@@ -97,4 +93,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Return just static pages if there's an error fetching manga
     return [...staticPages, ...genrePages];
   }
-} 
+}

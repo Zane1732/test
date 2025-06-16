@@ -118,7 +118,7 @@ export default async function SearchPage(props: SearchPageProps) {
     );
   }
   
-  // Fetch search results
+  // Fetch search results - Mock implementation for now
   let searchResults: SearchResponse = {
     currentPage: 1,
     hasNextPage: false,
@@ -126,13 +126,36 @@ export default async function SearchPage(props: SearchPageProps) {
   };
   
   try {
-    const response = await fetch(`https://asura-ten.vercel.app/api/search?query=${encodeURIComponent(query)}&page=${currentPage}`, { cache: 'no-store' });
+    // For now, we'll use the home API and filter results
+    const response = await fetch('https://mangafire-api-pi.vercel.app/api/home', { cache: 'no-store' });
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch search results');
+    if (response.ok) {
+      const data = await response.json();
+      
+      // Filter manga based on search query
+      const allManga = [
+        ...data.releasingManga,
+        ...data.newReleaseManga
+      ];
+      
+      const filteredManga = allManga.filter((manga: any) => 
+        manga.name?.toLowerCase().includes(query.toLowerCase()) ||
+        manga.genres?.some((genre: string) => genre.toLowerCase().includes(query.toLowerCase()))
+      );
+      
+      searchResults = {
+        currentPage: 1,
+        hasNextPage: false,
+        results: filteredManga.map((manga: any) => ({
+          id: manga.id.replace('/manga/', '').split('.')[0],
+          title: manga.name,
+          image: manga.poster,
+          status: manga.status || 'Unknown',
+          latestChapter: manga.currentChapter || 'Latest Chapter',
+          rating: '4.5'
+        }))
+      };
     }
-    
-    searchResults = await response.json();
   } catch (error) {
     console.error('Error fetching search results:', error);
   }
@@ -184,4 +207,4 @@ export default async function SearchPage(props: SearchPageProps) {
       </main>
     </div>
   );
-} 
+}

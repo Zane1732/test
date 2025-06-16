@@ -3,6 +3,8 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     domains: [
+      'static.mangafire.to',
+      'via.placeholder.com',
       'gg.asuracomic.net',
       'asuracomic.net',
       'asurascans.com', 
@@ -61,4 +63,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig; 
+module.exports = nextConfig;

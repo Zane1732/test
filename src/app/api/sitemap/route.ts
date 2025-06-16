@@ -74,12 +74,9 @@ export async function GET() {
     
     // Add manga detail pages
     for (const manga of combinedManga) {
-      // Make sure the ID doesn't have the "series/" prefix
-      const mangaId = manga.id.startsWith('series/') ? manga.id.replace('series/', '') : manga.id;
-      
       xml += `
   <url>
-    <loc>${baseUrl}/manga/${mangaId}</loc>
+    <loc>${baseUrl}/manga/${manga.id}</loc>
     <lastmod>${date}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -102,4 +99,4 @@ export async function GET() {
     console.error('Error generating sitemap:', error);
     return new NextResponse('Error generating sitemap', { status: 500 });
   }
-} 
+}
